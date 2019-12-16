@@ -23,14 +23,19 @@ def softmax(x):
 
 
 class FullyConnectedLayer:
-    def __init__(self, number_of_neurons_prev_layer, number_of_neurons):
+    def __init__(self, number_of_neurons, number_of_neurons_prev_layer):
 
-        self._weights = np.random.rand( number_of_neurons_prev_layer,number_of_neurons)
+
+
+        self._weights = np.random.rand( number_of_neurons,number_of_neurons_prev_layer)
         self._biases = np.random.rand(number_of_neurons)
 
     def output(self, inputs, output_layer=False):
-        print(self._weights.shape, inputs.shape,self._biases.shape)
-        output_before_activation = np.dot(self._weights, inputs) + self._biases
+        # print(self._weights.shape, inputs.shape,self._biases.shape)
+        # + np.dot(self._weights, inputs)
+        output_before_activation = np.dot(self._weights ,inputs)  + self._biases
+
+
         if output_layer:
             layer_output = softmax(output_before_activation)
         else:
