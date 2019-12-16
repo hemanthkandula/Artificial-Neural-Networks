@@ -149,9 +149,9 @@ if __name__ == '__main__':
     # train validation test split
 
     input_features = 4
-    output_feature = 1
+    output_feature = 3
 
-    neural_network = NeuralNetwork(inputs=4, hidden_layers=[5, 5, 5], output=3)
+    neural_network = NeuralNetwork(inputs=input_features, hidden_layers=[5, 5, 5], output=output_feature)
     neural_network.built()
 
     number_of_iterations = 1000
