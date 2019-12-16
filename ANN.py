@@ -23,25 +23,31 @@ def softmax(x):
 
 
 class FullyConnectedLayer:
-    def __init__(self, number_of_neurons, number_of_neurons_prev_layer):
+    def __init__(self, number_of_neurons, number_of_neurons_prev_layer,output_layer=False):
 
-
+        self.output_layer = output_layer
+        self.number_of_neurons =number_of_neurons
 
         self._weights = np.random.rand( number_of_neurons,number_of_neurons_prev_layer)
         self._biases = np.random.rand(number_of_neurons)
 
-    def output(self, inputs, output_layer=False):
+    def output(self, inputs):
         # print(self._weights.shape, inputs.shape,self._biases.shape)
         # + np.dot(self._weights, inputs)
         output_before_activation = np.dot(self._weights ,inputs)  + self._biases
 
 
-        if output_layer:
+        if self.output_layer:
             layer_output = softmax(output_before_activation)
         else:
             layer_output = relu(output_before_activation)
 
         return output_before_activation, layer_output
+
+
+    def __str__(self):
+        return "FullyConnectedLayer with " + str(self.number_of_neurons) \
+               +": weights shape = " + str(self._weights.shape)+ "  biases shape = " + str(self._biases.shape)
 
 
 class NeuralNetwork:
@@ -52,15 +58,25 @@ class NeuralNetwork:
         self.layers = []
 
 
+    def __str__(self):
+        stri = ""
+        for layer in self.layers:
+            stri+layer.__str__()+"\n"
+            print(layer)
+
+        return stri
+        # stri = "Fully connected layer with  "+ num_neurons""
+
+
 
 
     def built(self):
-        self.layers.append(FullyConnectedLayer(self.hidden_layers[0], self.inputs))  # input layer
+        self.layers.append(FullyConnectedLayer(self.hidden_layers[0], self.inputs))  # First layer
 
         for prev_layer_neurons, number_of_neurons in zip(self.hidden_layers, self.hidden_layers[1:]):
             self.layers.append(FullyConnectedLayer( number_of_neurons,prev_layer_neurons))  # hidden layers
 
-        self.layers.append(FullyConnectedLayer( self.output,self.hidden_layers[-1]))  # output layer
+        self.layers.append(FullyConnectedLayer( self.output,self.hidden_layers[-1], output_layer=True))  # output layer
 
     def forward_propagation(self, x):
         for layer in self.layers:
@@ -143,7 +159,7 @@ if __name__ == '__main__':
 
     print(neural_network.forward_propagation(x_train[0]))
 
-
+    print(neural_network)
     neural_network.train(num_iterations=number_of_iterations,
                          train_data=x_train,train_label=y_train,
                          validation_data=x_validation,validation_label=y_validation)
