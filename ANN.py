@@ -13,9 +13,22 @@ def sigmoid_activation(z, derivative=False):
 
 
 def relu(x):
-    return x * (x >= 0.)
+
+    return np.maximum(0,x)
+def relu_deriv(deltaX,Y):
+    deltaY = np.array(deltaX,copy=True)
+    deltaY[Y<=0] = 0
+    return deltaY
+
+def sigmoid_backward(dA, Z):
+    sig = sigmoid_activation(Z)
+    return dA * sig * (1 - sig)
 
 
+def relu_backward(dA, Z):
+    dZ = np.array(dA, copy = True)
+    dZ[Z <= 0] = 0;
+    return dZ;
 def softmax(x):
     """from https://stackoverflow.com/questions/34968722/how-to-implement-the-softmax-function-in-python"""
     """Compute softmax values for each sets of scores in x."""
@@ -42,7 +55,8 @@ class FullyConnectedLayer:
         output_before_activation = np.dot(self._weights, inputs) + self._biases
 
         if self.output_layer:
-            layer_output = softmax(output_before_activation)
+            # layer_output = softmax(output_before_activation)
+            layer_output = sigmoid_activation(output_before_activation)
         else:
             layer_output = relu(output_before_activation)
 
@@ -50,8 +64,29 @@ class FullyConnectedLayer:
         self.outputs_derv = relu(output_before_activation)
 
         self.output_before_activation = output_before_activation
+        self.inputs = inputs
 
         return output_before_activation, layer_output
+
+
+
+    def backward(self,delta_curr):
+
+        prev_layer_len = self.inputs.shape[1]
+
+        if self.output_layer:
+
+            deltaBA = sigmoid_backward(delta_curr,self.outputs)
+
+            # derivative of the matrix W
+            dW_curr = np.dot(dZ_curr, A_prev.T) / m
+            # derivative of the vector b
+            db_curr = np.sum(dZ_curr, axis=1, keepdims=True) / m
+            # derivative of the matrix A_prev
+            dA_prev = np.dot(W_curr.T, dZ_curr)
+
+
+
 
     def __str__(self):
         return "FullyConnectedLayer with " + str(self.number_of_neurons) \
@@ -152,6 +187,9 @@ class NeuralNetwork:
 
 
 
+    def back_prop2(self,y_train):
+        pass
+
 
     def mse(self, d, o):
 
@@ -159,6 +197,23 @@ class NeuralNetwork:
 
     def test(self, test_data, test_label):
         pass
+
+def get_cost_value(Y_hat, Y):
+    m = Y_hat.shape[1]
+    cost = -1 / m * (np.dot(Y, np.log(Y_hat).T) + np.dot(1 - Y, np.log(1 - Y_hat).T))
+    return np.squeeze(cost)
+
+
+def convert_prob_into_class(probs):
+    probs_ = np.copy(probs)
+    probs_[probs_ > 0.5] = 1
+    probs_[probs_ <= 0.5] = 0
+    return probs_
+def get_accuracy_value(Y_hat, Y):
+    Y_hat_ = convert_prob_into_class(Y_hat)
+    return (Y_hat_ == Y).all(axis=0).mean()
+
+
 
 
 def one_hot_encoding(x):
