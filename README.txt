@@ -7,6 +7,8 @@ File Specifications
 Files:
 README
 ANN_Iris.py
+Accuracy_curves.png (generated file)
+Loss_curves.png (generated file)
 
 ANN_Iris.py:
     
@@ -44,32 +46,36 @@ ANN_Iris.py:
             neuralnetwork of those dimensions, randomly generating weights and biases
             between those internal neurons
             
-            b. cross_entropy_loss and logistic loss: calculates the loss values to be 
-            used when validating back-propagation. When loss begins to increase, the ANN  
-            should not be trained more as error is likely to increase due to over
-            fitting. The loss functions allow us to identify this.
+            b. MSE loss and output error: MSE calculates the mean squared error values
+            to be used when validating back-propagation. When validation loss begins to
+            increase, the ANN should not be trained more as error is likely to increase
+            due to over fitting.The validation loss  allows us to identify this.
+            output_error function is used to find the error with neuralnetwork predicted
+            output and real (labelled) output
             
             c. feedforward: performs forward propagation by passing in the input values
             through the algorithm and calling sigmoid activation in order to get the
             output value of each hidden neuron as well as the output neurons. On the
             output layer, the function calls the aforementioned softmax method to
-            normalize output to a probablity distribution
+            normalize output to a probability distribution
             
             d. backprop: performs back-propagation by calculating the delta values of
             each neuron and adjusting weights and biases respectively. 
             
             e. evaluate: takes in structures storing input and output data and runs
             it through the algorithm, calculating the accuracy and loss (using the
-            logarathimic loss function discussed earlier) when it is ran through 
+            MSE loss function discussed earlier) when it is ran through
             before returning it. This is used in assessing the accuracy of the
-            Neural Network in testing
+            Neural Network in validating and testing
             
             f. train: handles the training of the Neural Network by handling inputted
             training and validation data. In each iteration, it feeds in the training
             data and runs back propagation on this before evaluating the data on both
             the training and the validation data, updating accuracy and loss values.
-            After iterating through, it generates a diagram representing the log loss
-            values on each iteration, outputted as "Loss_curves.png"
+            After iterating through, it generates a plot representing the mean squared
+            error loss values and another plot for accuracies values for training set
+            and validation set on each iteration, outputted as "Loss_curves.png" and
+            "Accuracy_curves.png"
             
             g. test: allows the user to call this function by inputting testing data
             and correct classifications as parameters, receiving accuracy and loss values
