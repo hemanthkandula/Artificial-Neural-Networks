@@ -42,8 +42,8 @@ class FullyConnectedLayer:
         self.number_of_neurons = number_of_neurons
 
         if weights is None and biases is None:
-            self._weights = np.random.rand(number_of_neurons, number_of_neurons_prev_layer)
-            self._biases = np.random.rand(number_of_neurons)
+            self._weights = np.random.randn(number_of_neurons, number_of_neurons_prev_layer)*0.1
+            self._biases = np.random.randn(number_of_neurons)*0.1
 
         else:
             self._weights = weights
@@ -77,13 +77,19 @@ class FullyConnectedLayer:
         if self.output_layer:
 
             deltaBA = sigmoid_backward(delta_curr,self.outputs)
+        else:
+            deltaBA = relu_backward(delta_curr,self.outputs)
 
-            # derivative of the matrix W
-            dW_curr = np.dot(dZ_curr, A_prev.T) / m
-            # derivative of the vector b
-            db_curr = np.sum(dZ_curr, axis=1, keepdims=True) / m
-            # derivative of the matrix A_prev
-            dA_prev = np.dot(W_curr.T, dZ_curr)
+
+        # derivative of the matrix W
+        self.dW_curr = np.dot(deltaBA, self.inputs.T) / prev_layer_len
+        # derivative of the vector b
+        self.db_curr = np.sum(deltaBA, axis=1, keepdims=True) / prev_layer_len
+        # derivative of the matrix A_prev
+        delta_curr = np.dot(self._weights.T, deltaBA)
+
+
+        return  delta_curr
 
 
 
@@ -167,10 +173,10 @@ class NeuralNetwork:
             valid_mse_cur =[]
 
             for x, y in zip(validation_data, validation_label):
-                _, actual_output = self.forward_propagation(x)
+                _, actiavtion_output = self.forward_propagation(x)
 
                 desired_output = one_hot_encoding(y)
-                mse = self.mse(desired_output, actual_output)
+                mse = self.mse(desired_output, actiavtion_output)
                 valid_mse_cur.append(mse)
 
             valid_mse = sum(valid_mse_cur)
@@ -187,8 +193,13 @@ class NeuralNetwork:
 
 
 
-    def back_prop2(self,y_train):
-        pass
+    def back_prop2(self,y_desired,y_output):
+
+        deltaBA =   (y_train - self.layers[-1].outputs)
+        for layer in reversed(self.layers):
+            deltaBA = layer.backward(deltaBA)
+
+
 
 
     def mse(self, d, o):
@@ -282,10 +293,11 @@ if __name__ == '__main__':
 
     print(neural_network.forward_propagation(x_train[0]))
 
+
     print(neural_network)
-    neural_network.train(num_iterations=number_of_iterations,
-                         train_data=x_train, train_label=y_train,
-                         validation_data=x_validation, validation_label=y_validation)
+    # neural_network.train(num_iterations=number_of_iterations,
+    #                      train_data=x_train, train_label=y_train,
+    #                      validation_data=x_validation, validation_label=y_validation)
     #
     # neural_network.test(
     #     test_data=x_train, test_label=y_train,
